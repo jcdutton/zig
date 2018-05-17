@@ -876,7 +876,10 @@ pub const AtomicFile = struct {
     /// dest_path must remain valid for the lifetime of AtomicFile
     /// call finish to atomically replace dest_path with contents
     pub fn init(allocator: &Allocator, dest_path: []const u8, mode: FileMode) !AtomicFile {
-        const dirname = os.path.dirname(dest_path);
+        var dirname = os.path.dirname(dest_path);
+        if (dirname.len == 0) {
+            dirname = ".";
+        }
 
         var rand_buf: [12]u8 = undefined;
         const tmp_path = try allocator.alloc(u8, dirname.len + 1 + base64.Base64Encoder.calcSize(rand_buf.len));
